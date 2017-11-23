@@ -1,0 +1,30 @@
+{
+  "name": "cmdland",
+  "version": "0.0.1",
+  "description": "process execution playback",
+  "main": "index.js",
+  "scripts": {
+    "build": "babel index.js -o build.js",
+    "test": "jest"
+  },
+  "repository": {
+    "type": "git",
+    "url": "git+ssh://git@github.com/winton/cmdland.git"
+  },
+  "keywords": [
+    "nodejs",
+    "process"
+  ],
+  "author": "Winton Welsh <winton@cyclo.ps>",
+  "license": "MIT",
+  "bugs": {
+    "url": "https://github.com/winton/cmdland/issues"
+  },
+  "homepage": "https://github.com/winton/cmdland#readme",
+  "devDependencies": {
+    "babel-cli": "^6.26.0",
+    "babel-plugin-transform-async-to-generator": "^6.24.1",
+    "babel-plugin-transform-object-rest-spread": "^6.26.0",
+    "babel-preset-node6": "^11.0.0"
+  }
+}
