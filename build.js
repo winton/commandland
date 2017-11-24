@@ -2,12 +2,6 @@
 
 var _nodePty = require("node-pty");
 
-var _stripAnsi = require("strip-ansi");
-
-var _stripAnsi2 = _interopRequireDefault(_stripAnsi);
-
-function _interopRequireDefault(obj) { return obj && obj.__esModule ? obj : { default: obj }; }
-
 // global
 //
 let epoch = Date.now();
@@ -33,12 +27,11 @@ let pty = (0, _nodePty.spawn)("bash", [], {
 });
 
 pty.on('data', function (data) {
-  // data = stripAnsi(data)
   write({ data });
   process.stdout.write(data);
 });
 
-pty.on("close", () => play());
+pty.on("close", play);
 
 // replay
 //

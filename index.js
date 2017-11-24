@@ -1,5 +1,4 @@
 import { spawn } from "node-pty"
-import stripAnsi from "strip-ansi"
 
 // global
 //
@@ -26,7 +25,6 @@ let pty = spawn("bash", [], {
 })
 
 pty.on('data', function(data) {
-  data = stripAnsi(data)
   write({ data })
   process.stdout.write(data)
 })
