@@ -28,9 +28,7 @@
     "babel-preset-node6": "^11.0.0"
   },
   "dependencies": {
-    "@manaflair/term-strings": "^0.9.1",
     "node-pty": "^0.7.3",
-    "strip-ansi": "^4.0.0",
-    "strip-ansi-stream": "^1.0.0"
+    "strip-ansi": "^4.0.0"
   }
 }

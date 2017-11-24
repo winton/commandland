@@ -1,58 +1,40 @@
-import stripStream from "strip-ansi-stream"
-import { spawn } from "child_process"
+import { spawn } from "node-pty"
+import stripAnsi from "strip-ansi"
 
-// process.stdin.setRawMode(true)
-
-let stdout = stripStream()
-let stderr = stripStream()
-let child = spawn("bash", [], { shell: true })
-
+// global
+//
 let epoch = Date.now()
 let session = []
 
-// child.stdout.on("data", data => {
-//   stdout.write(data)
-// })
-
-// child.stderr.on("data", data => {
-//   stderr.write(data)
-// })
-
-// stdout.on("readable", () => {
-//   let data = stdout.read()
-//   if (data) {
-//     write({ data, type: "out" })
-//     process.stdout.write(data)
-//   }
-// })
-
-// stderr.on("readable", () => {
-//   let data = stderr.read()
-//   if (data) {
-//     write({ data, type: "err" })
-//     process.stderr.write(data)
-//   }
-// })
-
-child.stdout.on("data", data => {
-  write({ data, type: "out" })
-  process.stdout.write(data)
-})
-
-child.stderr.on("data", data => {
-  write({ data, type: "err" })
-  process.stderr.write(data)
-})
+// process
+//
+process.stdin.setRawMode(true)
 
 process.stdin.on("data", data => {
-  write({ data, type: "in" })
-  try { child.stdin.write(data) } catch (e) {}
+  pty.write(data)
 })
 
 process.on('SIGINT', () => {})
 
-child.on("close", () => play())
+// pty
+//
+let pty = spawn("bash", [], {
+  cols: 100,
+  rows: 100,
+  cwd: process.env.HOME,
+  env: process.env
+})
 
+pty.on('data', function(data) {
+  data = stripAnsi(data)
+  write({ data })
+  process.stdout.write(data)
+})
+
+pty.on("close", play)
+
+// replay
+//
 function play() {
   let ms = 0
   let id = setInterval(() => {
@@ -67,17 +49,14 @@ function play() {
 
 function playTime(ms) {
   if (session[0] && session[0][0] <= ms) {
-    let [ undefined, type, data ] = session.shift()
-    if (type == "out" || type == "in") {
-      process.stdout.write(new Buffer(data))
-    } else if (type == "err") {
-      process.stderr.write(new Buffer(data))
-    }
+    let data = session.shift()[1]
+    process.stdout.write(new Buffer(data))
     playTime(ms)
   }
 }
 
-function write({ data, type }) {
+function write({ data }) {
   let time = Date.now() - epoch
-  session.push([ time, type, data.toJSON().data ])
+  data = Buffer.from(data, "utf8")
+  session.push([ time, data ])
 }
