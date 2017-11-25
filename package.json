@@ -1,8 +1,8 @@
 {
   "name": "commandland",
-  "version": "0.0.1",
+  "version": "0.0.2",
   "description": "terminal emulator with record & playback",
-  "main": "index.js",
+  "main": "./.build/index.js",
   "scripts": {
     "build": "babel index.js -o .build/index.js",
     "publish": "npm run build",
