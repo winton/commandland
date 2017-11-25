@@ -1,11 +1,12 @@
 {
   "name": "cmdland",
   "version": "0.0.1",
-  "description": "process execution playback",
+  "description": "terminal emulator with record & playback",
   "main": "index.js",
   "scripts": {
-    "build": "babel index.js -o build.js",
-    "test": "jest"
+    "build": "babel index.js -o .build/index.js",
+    "start": "doctoc --notitle README.md",
+    "test": "npm run build && node test.js"
   },
   "repository": {
     "type": "git",

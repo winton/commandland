@@ -3,21 +3,17 @@ import { emitKeypressEvents } from "readline"
 
 emitKeypressEvents(process.stdin)
 
-export async function cmd(options) {
-  let epoch = Date.now(), session = []
-  let pty = setupPty({ ...options, epoch, session })
+export async function run(command, args, opts) {
+  let options = setupOptions(command, args, opts)
+  let pty = setupPty(options)
 
   return new Promise((resolve, reject) => {
-    pty.on("close", () =>
-      resolve({ ...options, epoch, session })
-    )
-    pty.on("error", () =>
-      reject({ ...options, epoch, session })
-    )
+    pty.on("close", () => resolve(options))
+    pty.on("error", () => reject(options))
   })
 }
 
-export async function replay({ session }) {
+export async function replay(session) {
   let id, ms = 0
 
   return new Promise(resolve => {
@@ -32,9 +28,11 @@ export async function replay({ session }) {
   })
 }
 
-function catchCtrlC(ch, key) {
-  if (key && key.ctrl && key.name == 'c') {
-    process.exit()
+function keypressFn({ pty }) {
+  return (ch, key) => {
+    if (key && key.ctrl && key.name == 'c') {
+      pty.kill()
+    }
   }
 }
 
@@ -43,6 +41,26 @@ function playTime({ ms, session }) {
     let data = session.shift()[1]
     process.stdout.write(new Buffer(data))
     playTime({ ms, session })
+  }
+}
+
+function setupOptions(command, args, opts) {
+  let epoch = Date.now()
+  let session = []
+
+  if (command && command.constructor.name == "Object") {
+    opts = command
+    command = opts.command
+    args = opts.args
+  }
+
+  if (args && args.constructor.name == "Object") {
+    opts = args
+    args = []
+  }
+  
+  return {
+    ...opts, command, args, epoch, session
   }
 }
 
@@ -56,15 +74,18 @@ function setupPty({
   record = false,
   session
 }) {
-  let raw = process.stdin.isRaw
   let pty = spawn(command, args, {
     cols, cwd, env, name: "xterm-color", rows
   })
 
-  let writePty = data => pty.write(data)
+  let stdio = {
+    raw: process.stdin.isRaw,
+    keypress: keypressFn({ pty }),
+    writePty: data => pty.write(data)
+  }
 
   pty.on("close", data => {
-    teardownStdin({ raw, writePty })
+    teardownStdin(stdio)
   })
 
   pty.on("data", data => {
@@ -72,20 +93,20 @@ function setupPty({
     process.stdout.write(data)
   })
 
-  setupStdin({ writePty })
+  setupStdin(stdio)
 
   return pty
 }
 
-function setupStdin({ writePty }) {
+function setupStdin({ keypress, writePty }) {
   process.stdin.setRawMode(true)
-  process.stdin.on("keypress", catchCtrlC)
+  process.stdin.on("keypress", keypress)
   process.stdin.on("data", writePty)
 }
 
-function teardownStdin({ raw, writePty }) {
+function teardownStdin({ keypress, raw, writePty }) {
   process.stdin.setRawMode(raw)
-  process.stdin.removeListener("keypress", catchCtrlC)
+  process.stdin.removeListener("keypress", keypress)
   process.stdin.removeListener("data", writePty)
 }
 

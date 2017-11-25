@@ -1,8 +1,7 @@
-var cmd = require("./build")
+var commandland = require("./.build")
 
-cmd.cmd({ record: true }).then(function(output) {
-  return cmd.replay({ session: output.session })
+commandland.run({ record: true }).then(function(output) {
+  return commandland.replay(output.session)
 }).then(function() {
   process.exit()
 })
-
