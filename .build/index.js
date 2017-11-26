@@ -9,12 +9,11 @@ var _extends = Object.assign || function (target) { for (var i = 1; i < argument
 
 let run = exports.run = (() => {
   var _ref = _asyncToGenerator(function* (command, args, opts) {
-    let options = setupOptions(command, args, opts);
-    let pty = setupPty(options);
+    let { pty, options } = terminal(command, args, opts);
 
     return new Promise(function (resolve, reject) {
-      pty.on("close", function () {
-        return resolve(options);
+      pty.on("exit", function (code, signal) {
+        return resolve(_extends({}, options, { code, signal }));
       });
       pty.on("error", function () {
         return reject(options);
@@ -49,13 +48,49 @@ let replay = exports.replay = (() => {
   };
 })();
 
-var _nodePty = require("node-pty");
+exports.terminal = terminal;
 
-var _readline = require("readline");
+var _nodePty = require("node-pty");
 
 function _asyncToGenerator(fn) { return function () { var gen = fn.apply(this, arguments); return new Promise(function (resolve, reject) { function step(key, arg) { try { var info = gen[key](arg); var value = info.value; } catch (error) { reject(error); return; } if (info.done) { resolve(value); } else { return Promise.resolve(value).then(function (value) { step("next", value); }, function (err) { step("throw", err); }); } } return step("next"); }); }; }
 
-(0, _readline.emitKeypressEvents)(process.stdin);
+function terminal(...argv) {
+  let options = setupOptions(...argv);
+
+  let {
+    args = [],
+    command = "bash",
+    cols = 100, rows = 100,
+    cwd,
+    env,
+    epoch,
+    record = false,
+    session
+  } = options;
+
+  let pty = (0, _nodePty.spawn)(command, args, {
+    cols, cwd, env, name: "xterm-color", rows
+  });
+
+  let stdio = {
+    raw: process.stdin.isRaw,
+    keypress: keypressFn({ pty }),
+    writePty: data => pty.write(data)
+  };
+
+  pty.on("close", data => {
+    teardownStdin(stdio);
+  });
+
+  pty.on("data", data => {
+    writeSession({ data, epoch, record, session });
+    process.stdout.write(data);
+  });
+
+  setupStdin(stdio);
+
+  return { pty, options };
+}
 
 function keypressFn({ pty }) {
   return (ch, key) => {
@@ -92,49 +127,13 @@ function setupOptions(command, args, opts) {
   });
 }
 
-function setupPty({
-  args = [],
-  command = "bash",
-  cols = 100, rows = 100,
-  cwd,
-  env,
-  epoch,
-  record = false,
-  session
-}) {
-  let pty = (0, _nodePty.spawn)(command, args, {
-    cols, cwd, env, name: "xterm-color", rows
-  });
-
-  let stdio = {
-    raw: process.stdin.isRaw,
-    keypress: keypressFn({ pty }),
-    writePty: data => pty.write(data)
-  };
-
-  pty.on("close", data => {
-    teardownStdin(stdio);
-  });
-
-  pty.on("data", data => {
-    writeSession({ data, epoch, record, session });
-    process.stdout.write(data);
-  });
-
-  setupStdin(stdio);
-
-  return pty;
-}
-
 function setupStdin({ keypress, writePty }) {
   process.stdin.setRawMode(true);
-  process.stdin.on("keypress", keypress);
   process.stdin.on("data", writePty);
 }
 
 function teardownStdin({ keypress, raw, writePty }) {
   process.stdin.setRawMode(raw);
-  process.stdin.removeListener("keypress", keypress);
   process.stdin.removeListener("data", writePty);
 }
 

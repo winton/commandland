@@ -1,6 +1,6 @@
 {
   "name": "commandland",
-  "version": "0.0.2",
+  "version": "0.0.3",
   "description": "terminal emulator with record & playback",
   "main": "./.build/index.js",
   "scripts": {
