@@ -92,14 +92,6 @@ function terminal(...argv) {
   return { pty, options };
 }
 
-function keypressFn({ pty }) {
-  return (ch, key) => {
-    if (key && key.ctrl && key.name == 'c') {
-      pty.kill();
-    }
-  };
-}
-
 function playTime({ ms, session }) {
   if (session[0] && session[0][0] <= ms) {
     let data = session.shift()[1];
