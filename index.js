@@ -4,13 +4,13 @@ export function terminal(...argv) {
   let options = setupOptions(...argv)
 
   let {
-    args = [],
-    command = "bash",
-    cols = 100, rows = 100,
+    args,
+    command,
+    cols, rows,
     cwd,
     env,
     epoch,
-    record = false,
+    record,
     session
   } = options
 
@@ -20,7 +20,6 @@ export function terminal(...argv) {
 
   let stdio = {
     raw: process.stdin.isRaw,
-    keypress: keypressFn({ pty }),
     writePty: data => pty.write(data)
   }
 
@@ -29,6 +28,7 @@ export function terminal(...argv) {
   })
 
   pty.on("data", data => {
+    options.out += data
     writeSession({ data, epoch, record, session })
     process.stdout.write(data)
   })
@@ -88,6 +88,10 @@ function setupOptions(command, args, opts) {
   }
   
   return {
+    command: "bash",
+    record: false,
+    cols: 100, rows: 100,
+    out: "",
     ...opts, command, args, epoch, session
   }
 }
