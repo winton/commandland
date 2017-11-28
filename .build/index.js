@@ -65,7 +65,8 @@ function terminal(...argv) {
     env,
     epoch,
     record,
-    session
+    session,
+    silent
   } = options;
 
   let pty = (0, _nodePty.spawn)(command, args, {
@@ -84,7 +85,7 @@ function terminal(...argv) {
   pty.on("data", data => {
     options.out += data;
     writeSession({ data, epoch, record, session });
-    process.stdout.write(data);
+    if (!silent) process.stdout.write(data);
   });
 
   setupStdin(stdio);
@@ -117,9 +118,10 @@ function setupOptions(command, args, opts) {
 
   return _extends({
     command: "bash",
-    record: false,
     cols: 100, rows: 100,
-    out: ""
+    out: "",
+    record: false,
+    silent: false
   }, opts, { command, args, epoch, session
   });
 }
