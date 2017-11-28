@@ -134,6 +134,7 @@ function setupStdin({ keypress, writePty }) {
 function teardownStdin({ keypress, raw, writePty }) {
   process.stdin.setRawMode(raw);
   process.stdin.removeListener("data", writePty);
+  process.stdin.unref();
 }
 
 function writeSession({ data, epoch, record = true, session }) {
