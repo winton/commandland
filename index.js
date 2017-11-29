@@ -1,4 +1,5 @@
 import { spawn } from "node-pty"
+import { EventEmitter } from "events"
 
 export function terminal(...argv) {
   let options = setupOptions(...argv)
@@ -100,6 +101,7 @@ function setupOptions(command, args, opts) {
 
 function setupStdin({ keypress, writePty }) {
   process.stdin.setRawMode(true)
+  process.stdin.setMaxListeners(1000)
   process.stdin.on("data", writePty)
 }
 
