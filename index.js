@@ -13,7 +13,8 @@ export function terminal(...argv) {
     epoch,
     record,
     session,
-    silent
+    silent,
+    stdin
   } = options
 
   let pty = spawn(command, args, {
@@ -26,7 +27,7 @@ export function terminal(...argv) {
   }
 
   pty.on("close", data => {
-    teardownStdin(stdio)
+    if (stdin) teardownStdin(stdio)
   })
 
   pty.on("data", data => {
@@ -35,7 +36,7 @@ export function terminal(...argv) {
     if (!silent) process.stdout.write(data)
   })
 
-  setupStdin(stdio)
+  if (stdin) setupStdin(stdio)
 
   return { pty, options }
 }

@@ -68,7 +68,8 @@ function terminal(...argv) {
     epoch,
     record,
     session,
-    silent
+    silent,
+    stdin
   } = options;
 
   let pty = (0, _nodePty.spawn)(command, args, {
@@ -81,7 +82,7 @@ function terminal(...argv) {
   };
 
   pty.on("close", data => {
-    teardownStdin(stdio);
+    if (stdin) teardownStdin(stdio);
   });
 
   pty.on("data", data => {
@@ -90,7 +91,7 @@ function terminal(...argv) {
     if (!silent) process.stdout.write(data);
   });
 
-  setupStdin(stdio);
+  if (stdin) setupStdin(stdio);
 
   return { pty, options };
 }
