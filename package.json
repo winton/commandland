@@ -30,6 +30,6 @@
     "babel-preset-node6": "^11.0.0"
   },
   "dependencies": {
-    "node-pty": "^0.7.3"
+    "node-pty": "^0.7.4"
   }
 }

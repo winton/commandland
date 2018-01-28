@@ -11,13 +11,13 @@ I make executing commands look good.
 | (Or keep live stdout/stdin silent) |
 | Capture output as string |
 | Exit code and signal capture |
-| Session record & playback |
+| [Session record & playback](#replay-a-session) |
 
 ## Run a command
 
 ```js
 import { run } from "commandland"
-await run("ls", ["/"])
+let { code, out } = await run("ls", ["/"])
 ```
 
 ## Execution options
@@ -26,7 +26,7 @@ await run("ls", ["/"])
 | --- | --- | --- |
 | args | `["/"]` | Command arguments |
 | command | `"ls"` | Command to execute |
-| cols, rows | `100` | Column and rows for pty |
+| cols, rows | `100`, `100` | Column and rows for pty |
 | cwd | `process.env.HOME` | Working directory for pty |
 | env | `process.env` | Environment for pty |
 | record | `false` | Record the session |
