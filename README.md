@@ -1,35 +1,40 @@
-
 # commandland
 
-terminal emulator with record & playback
+I make executing commands look good.
 
-<!-- START doctoc generated TOC please keep comment here to allow auto update -->
-<!-- DON'T EDIT THIS SECTION, INSTEAD RE-RUN doctoc TO UPDATE -->
+| Feature |
+| --- |
+| Live stdin works |
+| Live stdout with ASCII colors |
+| (Or keep live stdout/stdin silent) |
+| Capture output as string |
+| Exit code and signal capture |
+| Session record & playback |
 
-
-- [record anything!](#record-anything)
-- [run a command](#run-a-command)
-- [replay a command](#replay-a-command)
-
-<!-- END doctoc generated TOC please keep comment here to allow auto update -->
-
-## record anything!
-
-* automation scripts
-* live bash sessions
-* automated + live input hybrid
-
-## run a command
+## Run a command
 
 ```js
 import { run } from "commandland"
-await run("ls", [ "/" ])
+await run("ls", ["/"])
 ```
 
-## replay a command
+## Execution options
+
+| Option | Example | Purpose |
+| --- | --- | --- |
+| args | `["/"]` | Command arguments |
+| command | `"ls"` | Command to execute |
+| cols, rows | `100` | Column and rows for pty |
+| cwd | `process.env.HOME` | Working directory for pty |
+| env | `process.env` | Environment for pty |
+| record | `false` | Record the session |
+| silent | `false` | Execute without stdout |
+| stdin | `false` | Allow stdin input |
+
+## Replay a session
 
 ```js
-import { command, replay } from "commandland"
-let { session } = await command("ls", [ "/" ], { record: true })
+import { run, replay } from "commandland"
+let { session } = await run("ls", ["/"], { record: true })
 await replay(session)
 ```
