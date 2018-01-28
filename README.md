@@ -2,7 +2,7 @@
 
 I make executing commands look good.
 
-![No](https://www.nucksmisconduct.com/2016/3/14/11220326/you-know-the-difference-between-you-and-me-i-make-this-look-good-jets)
+![No](https://cdn.vox-cdn.com/thumbor/LqIoaTI0uqtGV8kxZ-vC3yzWx9M=/cdn.vox-cdn.com/uploads/chorus_asset/file/6188437/giphy.0.gif)
 
 | Feature |
 | --- |
