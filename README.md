@@ -2,10 +2,12 @@
 
 I make executing commands look good.
 
+![No](https://www.nucksmisconduct.com/2016/3/14/11220326/you-know-the-difference-between-you-and-me-i-make-this-look-good-jets)
+
 | Feature |
 | --- |
-| Live stdin works |
 | Live stdout with ASCII colors |
+| Live stdin |
 | (Or keep live stdout/stdin silent) |
 | Capture output as string |
 | Exit code and signal capture |
