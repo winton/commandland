@@ -11,6 +11,7 @@ export function terminal(...argv) {
     cwd,
     env,
     epoch,
+    onData,
     record,
     session,
     silent,
@@ -32,7 +33,13 @@ export function terminal(...argv) {
 
   pty.on("data", data => {
     options.out += data
+    
+    if (onData) {
+      onData({ out, pty })
+    }
+    
     writeSession({ data, epoch, record, session })
+    
     if (!silent) process.stdout.write(data)
   })
 
@@ -48,7 +55,7 @@ export async function run(command, args, opts) {
     pty.on("exit", (code, signal) =>
       resolve({ ...options, code, signal })
     )
-    pty.on("error", () => reject(options))
+    pty.on("error", e => reject(e))
   })
 }
 

@@ -29,6 +29,7 @@ let { code, out } = await run("ls", ["/"])
 | cols, rows | `100`, `100` | Column and rows for pty |
 | cwd | `process.env.HOME` | Working directory for pty |
 | env | `process.env` | Environment for pty |
+| onData | `()=>{}` | Pty data callback |
 | record | `false` | Record the session |
 | silent | `false` | Execute without stdout |
 | stdin | `false` | Allow stdin input |
