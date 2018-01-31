@@ -15,8 +15,8 @@ let run = exports.run = (() => {
       pty.on("exit", function (code, signal) {
         return resolve(_extends({}, options, { code, signal }));
       });
-      pty.on("error", function () {
-        return reject(options);
+      pty.on("error", function (e) {
+        return reject(e);
       });
     });
   });
@@ -66,6 +66,7 @@ function terminal(...argv) {
     cwd,
     env,
     epoch,
+    onData,
     record,
     session,
     silent,
@@ -87,7 +88,13 @@ function terminal(...argv) {
 
   pty.on("data", data => {
     options.out += data;
+
+    if (onData) {
+      onData({ out, pty });
+    }
+
     writeSession({ data, epoch, record, session });
+
     if (!silent) process.stdout.write(data);
   });
 

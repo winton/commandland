@@ -5,7 +5,7 @@
   "main": "./.build/index.js",
   "scripts": {
     "build": "babel index.js -o .build/index.js",
-    "publish": "npm run build",
+    "prepublish": "npm run build",
     "start": "doctoc --notitle README.md",
     "test": "npm run build && node test.js"
   },
