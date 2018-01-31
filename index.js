@@ -35,7 +35,7 @@ export function terminal(...argv) {
     options.out += data
     
     if (onData) {
-      onData({ out, pty })
+      onData({ out: options.out, pty })
     }
     
     writeSession({ data, epoch, record, session })
