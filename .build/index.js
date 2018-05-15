@@ -77,13 +77,8 @@ function terminal(...argv) {
     cols, cwd, env, name: "xterm-color", rows
   });
 
-  let stdio = {
-    raw: process.stdin.isRaw,
-    writePty: data => pty.write(data)
-  };
-
   pty.on("close", data => {
-    if (stdin) teardownStdin(stdio);
+    if (stdin) teardownStdin(pty);
   });
 
   pty.on("data", data => {
@@ -98,7 +93,7 @@ function terminal(...argv) {
     if (!silent) process.stdout.write(data);
   });
 
-  if (stdin) setupStdin(stdio);
+  if (stdin) setupStdin(pty);
 
   return { pty, options };
 }
@@ -136,16 +131,15 @@ function setupOptions(command, args, opts) {
   });
 }
 
-function setupStdin({ keypress, writePty }) {
+function setupStdin(pty) {
+  process.stdin.setEncoding("utf8");
   process.stdin.setRawMode(true);
-  process.stdin.setMaxListeners(1000);
-  process.stdin.on("data", writePty);
+  process.stdin.pipe(pty);
 }
 
-function teardownStdin({ keypress, raw, writePty }) {
-  process.stdin.setRawMode(raw);
-  process.stdin.removeListener("data", writePty);
-  process.stdin.unref();
+function teardownStdin(pty) {
+  process.stdin.unpipe(pty);
+  process.stdin.setRawMode(false);
 }
 
 function writeSession({ data, epoch, record = true, session }) {
